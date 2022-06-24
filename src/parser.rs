@@ -180,9 +180,9 @@ mod tests {
     #[test]
     fn test_value() -> Result<()> {
         let expr = Parser::new("1").parse()?;
-        assert!(matches!(expr, Expr::Literal { value } if value == 1.0));
+        assert!(matches!(expr, Expr::Literal { value } if value == 1));
         let expr = Parser::new("4000").parse()?;
-        assert!(matches!(expr, Expr::Literal { value } if value == 4000. ));
+        assert!(matches!(expr, Expr::Literal { value } if value == 4000 ));
 
         let result = Parser::new("4000.53.10").parse();
         assert!(result.is_err());

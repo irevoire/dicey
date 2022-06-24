@@ -58,11 +58,11 @@ impl Expr<'_> {
                 faces,
             } => {
                 let quantity = quantity.interpret(interpreter)?;
-                let faces = *faces.interpret(interpreter)? as usize;
+                let faces = *faces.interpret(interpreter)?;
 
-                let res = (0..*quantity as usize)
-                    .fold(0, |value, _| value + interpreter.rng.gen_range(0..faces));
-                Ok(Value::new(res as f64))
+                let res =
+                    (0..*quantity).fold(0, |value, _| value + interpreter.rng.gen_range(0..faces));
+                Ok(Value::new(res))
             }
         }
     }
@@ -75,30 +75,30 @@ mod tests {
     #[test]
     fn test_value() -> Result<(), Error> {
         let res = Interpreter::run("1")?;
-        assert_eq!(res, 1.);
+        assert_eq!(res, 1);
         let res = Interpreter::run("4000")?;
-        assert_eq!(res, 4000.);
+        assert_eq!(res, 4000);
         Ok(())
     }
 
     #[test]
     fn test_unary() -> Result<(), Error> {
         let res = Interpreter::run("-1")?;
-        assert_eq!(res, -1.);
+        assert_eq!(res, -1);
         Ok(())
     }
 
     #[test]
     fn test_binary() -> Result<(), Error> {
         let test_values = [
-            ("1 + 1", 2.),
-            ("5 - 1", 4.),
-            ("2 * 3", 6.),
-            ("6 / 3", 2.),
-            ("1 / 2", 0.5),
-            ("2 + 3 * 2", 8.),
-            ("2 + (3 * 2)", 8.),
-            ("2 * (3 + 2)", 10.),
+            ("1 + 1", 2),
+            ("5 - 1", 4),
+            ("2 * 3", 6),
+            ("6 / 3", 2),
+            ("1 / 2", 0),
+            ("2 + 3 * 2", 8),
+            ("2 + (3 * 2)", 8),
+            ("2 * (3 + 2)", 10),
         ];
 
         for (input, output) in test_values {

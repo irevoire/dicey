@@ -5,11 +5,11 @@ use std::{
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Value {
-    inner: f64,
+    inner: isize,
 }
 
 impl Value {
-    pub fn new(inner: f64) -> Self {
+    pub fn new(inner: isize) -> Self {
         Self { inner }
     }
 }
@@ -20,14 +20,14 @@ impl Display for Value {
     }
 }
 
-impl PartialEq<f64> for Value {
-    fn eq(&self, other: &f64) -> bool {
+impl PartialEq<isize> for Value {
+    fn eq(&self, other: &isize) -> bool {
         self.inner == *other
     }
 }
 
 impl Deref for Value {
-    type Target = f64;
+    type Target = isize;
 
     fn deref(&self) -> &Self::Target {
         &self.inner
