@@ -80,7 +80,7 @@ impl<'a> Parser<'a> {
     fn roll(&mut self) -> Result<Expr<'a>> {
         let mut expr = self.unary()?;
 
-        if self.is_followed_by([TokenType::Dice])? {
+        while self.is_followed_by([TokenType::Dice])? {
             let dice = self.previous.clone();
             let faces = Box::new(self.primary()?);
 
