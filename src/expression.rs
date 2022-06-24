@@ -15,6 +15,11 @@ pub enum Expr<'a> {
         expression: Box<Expr<'a>>,
     },
     Literal {
-        value: Value<'a>,
+        value: Value,
+    },
+    Roll {
+        quantity: Box<Expr<'a>>,
+        dice: Token<'a>,
+        face: Box<Expr<'a>>,
     },
 }

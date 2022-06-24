@@ -1,17 +1,15 @@
 [package]
-name = "goudale"
+name = "dicey"
 version = "0.1.0"
 edition = "2021"
-description = "A typed scientific calculator"
+description = "Can roll dice if you ask politely"
 license = "WTFPL"
-repository = "https://github.com/irevoire/goudale"
-keywords = ["calculator", "type"]
+repository = "https://github.com/irevoire/dicey"
+keywords = ["dice", "roll", "dnd"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-nom = "7.1.1"
-nom_locate = "4.0.0"
 logos = "0.12.1"
 thiserror = "1.0.31"
 anyhow = "1.0.56"

@@ -28,6 +28,11 @@ impl Expr<'_> {
             }
             Expr::Grouping { expression } => expression.interpret(),
             Expr::Literal { value } => Ok(value.clone()),
+            Expr::Roll {
+                quantity,
+                dice,
+                face,
+            } => todo!(),
         }
     }
 }
@@ -41,9 +46,9 @@ mod tests {
         let parser = Parser::new("1").parse()?;
         let res = parser.interpret()?;
         assert_eq!(res, 1.);
-        let parser = Parser::new("4000.53").parse()?;
+        let parser = Parser::new("4000").parse()?;
         let res = parser.interpret()?;
-        assert_eq!(res, 4000.53);
+        assert_eq!(res, 4000.);
         Ok(())
     }
 
@@ -66,7 +71,6 @@ mod tests {
             ("2 + 3 * 2", 8.),
             ("2 + (3 * 2)", 8.),
             ("2 * (3 + 2)", 10.),
-            ("2 (3 + 2)", 10.),
         ];
 
         for (input, output) in test_values {

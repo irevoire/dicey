@@ -1,10 +1,9 @@
-use miette::IntoDiagnostic;
 use std::{
     io::{BufRead, Write},
     path::Path,
 };
 
-use goudale::*;
+use dicey::*;
 
 fn main() -> Result<()> {
     let args: Vec<_> = std::env::args().collect();

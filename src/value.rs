@@ -3,33 +3,30 @@ use std::{
     ops::{Add, Deref, Div, Mul, Neg, Sub},
 };
 
-use crate::Ty;
-
 #[derive(Debug, Clone, PartialEq)]
-pub struct Value<'a> {
+pub struct Value {
     inner: f64,
-    ty: Option<Ty<'a>>,
 }
 
-impl<'a> Value<'a> {
-    pub fn new(inner: f64, ty: Option<Ty<'a>>) -> Self {
-        Self { inner, ty }
+impl Value {
+    pub fn new(inner: f64) -> Self {
+        Self { inner }
     }
 }
 
-impl Display for Value<'_> {
+impl Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.inner)
     }
 }
 
-impl PartialEq<f64> for Value<'_> {
+impl PartialEq<f64> for Value {
     fn eq(&self, other: &f64) -> bool {
         self.inner == *other
     }
 }
 
-impl Deref for Value<'_> {
+impl Deref for Value {
     type Target = f64;
 
     fn deref(&self) -> &Self::Target {
@@ -37,45 +34,42 @@ impl Deref for Value<'_> {
     }
 }
 
-impl<'a> Add for Value<'a> {
-    type Output = Value<'a>;
+impl Add for Value {
+    type Output = Value;
 
     fn add(self, rhs: Self) -> Self::Output {
-        // TODO: check the types
-        Self::new(self.inner + rhs.inner, self.ty)
+        Self::new(self.inner + rhs.inner)
     }
 }
 
-impl<'a> Sub for Value<'a> {
-    type Output = Value<'a>;
+impl Sub for Value {
+    type Output = Value;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        // TODO: check the types
-        Self::new(self.inner - rhs.inner, self.ty)
+        Self::new(self.inner - rhs.inner)
     }
 }
 
-impl<'a> Neg for Value<'a> {
-    type Output = Value<'a>;
+impl Neg for Value {
+    type Output = Value;
 
     fn neg(self) -> Self::Output {
-        Self::new(-self.inner, self.ty)
+        Self::new(-self.inner)
     }
 }
 
-impl<'a> Mul for Value<'a> {
-    type Output = Value<'a>;
+impl Mul for Value {
+    type Output = Value;
 
     fn mul(self, rhs: Self) -> Self::Output {
-        // TODO: check the types
-        Self::new(self.inner * rhs.inner, self.ty)
+        Self::new(self.inner * rhs.inner)
     }
 }
 
-impl<'a> Div for Value<'a> {
-    type Output = Value<'a>;
+impl Div for Value {
+    type Output = Value;
 
     fn div(self, rhs: Self) -> Self::Output {
-        Self::new(self.inner / rhs.inner, self.ty)
+        Self::new(self.inner / rhs.inner)
     }
 }

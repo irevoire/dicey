@@ -20,7 +20,7 @@ impl<'source> Token<'source> {
         } else {
             Self {
                 source,
-                span: source.len()..source.len(),
+                span: source.len().saturating_sub(1)..source.len(),
                 ty: TokenType::EoF,
             }
         }
@@ -47,10 +47,12 @@ pub enum TokenType {
     Star,
 
     // Literals
-    #[regex(r#"[0-9]+(\.[0-9]*)?"#)]
+    #[regex(r#"[0-9]+"#)]
     Number,
-    #[regex("[_a-zA-Z]+")]
-    Type,
+    #[regex(r#"[0-9]+\.[0-9]*"#)]
+    Float,
+    #[regex("[dD]")]
+    Dice,
 
     #[regex(r"[ \r\t\n]+", logos::skip)]
     #[error]
