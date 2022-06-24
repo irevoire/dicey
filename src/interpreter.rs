@@ -31,8 +31,13 @@ impl Expr<'_> {
             Expr::Roll {
                 quantity,
                 dice,
-                face,
-            } => todo!(),
+                faces,
+            } => {
+                let quantity = quantity.interpret()?;
+                let faces = faces.interpret()?;
+
+                Ok(quantity * faces)
+            }
         }
     }
 }

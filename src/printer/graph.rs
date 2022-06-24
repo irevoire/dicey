@@ -42,14 +42,14 @@ impl Expr<'_> {
             Self::Roll {
                 quantity,
                 dice,
-                face,
+                faces,
             } => {
                 let id = format!("roll_{count}");
                 *count += 1;
                 res.push_str(&format!("{id}\n"));
                 res.push_str(&format!("\t{id} [label=\"{}\"]\n", dice.lexeme()));
                 res.push_str(&format!("\t{id} -> {}", quantity._graph(count)));
-                res.push_str(&format!("\t{id} -> {}", face._graph(count)));
+                res.push_str(&format!("\t{id} -> {}", faces._graph(count)));
             }
             Self::Unary { right, operator } => {
                 let id = format!("unary_{count}");

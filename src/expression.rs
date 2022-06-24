@@ -20,6 +20,6 @@ pub enum Expr<'a> {
     Roll {
         quantity: Box<Expr<'a>>,
         dice: Token<'a>,
-        face: Box<Expr<'a>>,
+        faces: Box<Expr<'a>>,
     },
 }

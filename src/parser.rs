@@ -1,6 +1,6 @@
 use logos::{Lexer, Logos};
 
-use crate::{Expr, ParserError, Token, TokenType, Ty};
+use crate::{Expr, ParserError, Token, TokenType};
 
 type Result<T> = std::result::Result<T, ParserError>;
 
@@ -61,16 +61,33 @@ impl<'a> Parser<'a> {
     }
 
     fn factor(&mut self) -> Result<Expr<'a>> {
-        let mut expr = self.unary()?;
+        let mut expr = self.roll()?;
 
-        while self.is_followed_by([TokenType::Star, TokenType::Slash, TokenType::LeftParen])? {
+        while self.is_followed_by([TokenType::Star, TokenType::Slash])? {
             let operator = self.previous.clone();
-            let right = Box::new(self.unary()?);
+            let right = Box::new(self.roll()?);
 
             expr = Expr::Binary {
                 left: Box::new(expr),
                 operator,
                 right,
+            };
+        }
+
+        Ok(expr)
+    }
+
+    fn roll(&mut self) -> Result<Expr<'a>> {
+        let mut expr = self.unary()?;
+
+        if self.is_followed_by([TokenType::Dice])? {
+            let dice = self.previous.clone();
+            let faces = Box::new(self.primary()?);
+
+            expr = Expr::Roll {
+                quantity: Box::new(expr),
+                dice,
+                faces,
             };
         }
 
