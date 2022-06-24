@@ -118,8 +118,8 @@ impl<'a> Parser<'a> {
             }
             ty => Err(ParserError {
                 src: self.lexer.source().to_string(),
-                message: format!("Was expecting a number but instead got {ty:?}",),
-                span: self.current.span.clone().into(),
+                message: format!("Expecting a number or a parenthesis but instead got {ty:?}",),
+                span: self.previous.span.clone().into(),
             }),
         }
     }
@@ -166,10 +166,7 @@ impl<'a> Parser<'a> {
         } else {
             Err(ParserError {
                 src: self.lexer.source().to_string(),
-                message: format!(
-                    "Was expecting `{}` but instead got {ty:?}",
-                    expecting.as_ref()
-                ),
+                message: format!("Expecting `{}` but instead got {ty:?}", expecting.as_ref()),
                 span: self.current.span.clone().into(),
             })
         }
