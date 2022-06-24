@@ -1,12 +1,36 @@
 use crate::{Expr, InterpreterError, Value};
+use rand::{rngs::ThreadRng, Rng};
 
 type Result<T> = std::result::Result<T, InterpreterError>;
 
+pub struct Interpreter {
+    rng: ThreadRng,
+}
+
+impl Interpreter {
+    pub fn new() -> Self {
+        Self {
+            rng: rand::thread_rng(),
+        }
+    }
+
+    pub fn run(source: &str) -> crate::error::Result<Value> {
+        let parser = crate::parser::Parser::new(source);
+        let expr = parser.parse()?;
+        let mut interpreter = Self::new();
+        Ok(interpreter.interpret(&expr)?)
+    }
+
+    pub fn interpret(&mut self, expression: &Expr<'_>) -> Result<Value> {
+        expression.interpret(self)
+    }
+}
+
 impl Expr<'_> {
-    pub fn interpret(&self) -> Result<Value> {
+    fn interpret(&self, interpreter: &mut Interpreter) -> Result<Value> {
         match self {
             Expr::Unary { operator, right } => {
-                let right = right.interpret()?;
+                let right = right.interpret(interpreter)?;
                 match operator.lexeme() {
                     "-" => Ok(-right),
                     _ => unreachable!(),
@@ -17,7 +41,7 @@ impl Expr<'_> {
                 operator,
                 right,
             } => {
-                let (left, right) = (left.interpret()?, right.interpret()?);
+                let (left, right) = (left.interpret(interpreter)?, right.interpret(interpreter)?);
                 match operator.lexeme() {
                     "+" => Ok(left + right),
                     "-" => Ok(left - right),
@@ -26,17 +50,19 @@ impl Expr<'_> {
                     _ => unreachable!(),
                 }
             }
-            Expr::Grouping { expression } => expression.interpret(),
+            Expr::Grouping { expression } => expression.interpret(interpreter),
             Expr::Literal { value } => Ok(value.clone()),
             Expr::Roll {
                 quantity,
-                dice,
+                dice: _dice,
                 faces,
             } => {
-                let quantity = quantity.interpret()?;
-                let faces = faces.interpret()?;
+                let quantity = quantity.interpret(interpreter)?;
+                let faces = *faces.interpret(interpreter)? as usize;
 
-                Ok(quantity * faces)
+                let res = (0..*quantity as usize)
+                    .fold(0, |value, _| value + interpreter.rng.gen_range(0..faces));
+                Ok(Value::new(res as f64))
             }
         }
     }
@@ -44,23 +70,20 @@ impl Expr<'_> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Error, Parser};
+    use crate::{Error, Interpreter};
 
     #[test]
     fn test_value() -> Result<(), Error> {
-        let parser = Parser::new("1").parse()?;
-        let res = parser.interpret()?;
+        let res = Interpreter::run("1")?;
         assert_eq!(res, 1.);
-        let parser = Parser::new("4000").parse()?;
-        let res = parser.interpret()?;
+        let res = Interpreter::run("4000")?;
         assert_eq!(res, 4000.);
         Ok(())
     }
 
     #[test]
     fn test_unary() -> Result<(), Error> {
-        let parser = Parser::new("-1").parse()?;
-        let res = parser.interpret()?;
+        let res = Interpreter::run("-1")?;
         assert_eq!(res, -1.);
         Ok(())
     }
@@ -80,8 +103,7 @@ mod tests {
 
         for (input, output) in test_values {
             println!("parsing {input}");
-            let parser = Parser::new(input).parse()?;
-            let res = parser.interpret()?;
+            let res = Interpreter::run(input)?;
             assert_eq!(res, output);
         }
         Ok(())

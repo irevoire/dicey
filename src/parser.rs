@@ -188,41 +188,14 @@ mod tests {
         assert!(matches!(expr, Expr::Literal { value } if value == 4000. ));
 
         let result = Parser::new("4000.53.10").parse();
-        dbg!(result);
-        assert!(true);
-        /*
-        assert!(matches!(
-            result,
-            Ok(3) // Err(ParserError::Scanner(ScannerError::UnexpectedChar('.')))
-        ));
-        */
+        assert!(result.is_err());
         // Here we get the error before even calling parse because the
         // parser needs to call the scanner once to initialize it’s state
         let result = Parser::new("a").parse();
         assert!(matches!(result, Err(ParserError { .. })));
         let result = Parser::new("400a").parse();
-        dbg!(result);
-        assert!(true);
-        /*
-        assert!(matches!(
-            result,
-            Err(ParserError::Scanner(ScannerError::UnexpectedChar('a')))
-        ));
-        */
+        assert!(result.is_err());
 
-        Ok(())
-    }
-
-    #[test]
-    fn test_unary() -> Result<()> {
-        let expr = Parser::new("-1").parse()?;
-        assert!(matches!(
-            expr,
-            Expr::Unary {
-                operator,
-                right: box Expr::Literal { value }
-            } if operator.ty == TokenType::Minus && value == 1.
-        ));
         Ok(())
     }
 }
