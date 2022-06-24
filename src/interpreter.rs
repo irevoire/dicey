@@ -1,4 +1,4 @@
-use crate::{Expr, InterpreterError, Value};
+use crate::{Expr, InterpreterError, Kind, Value};
 use rand::{rngs::ThreadRng, Rng};
 
 type Result<T> = std::result::Result<T, InterpreterError>;
@@ -60,9 +60,10 @@ impl Expr<'_> {
                 let quantity = quantity.interpret(interpreter)?;
                 let faces = *faces.interpret(interpreter)?;
 
-                let res =
-                    (0..*quantity).fold(0, |value, _| value + interpreter.rng.gen_range(0..faces));
-                Ok(Value::new(res))
+                let results: Vec<isize> = (0..*quantity)
+                    .map(|_| interpreter.rng.gen_range(0..faces))
+                    .collect();
+                Ok(Value::kind(results.iter().sum(), Kind::Roll(results)))
             }
         }
     }

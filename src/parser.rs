@@ -128,7 +128,7 @@ impl<'a> Parser<'a> {
         let value = self.previous.lexeme().parse().unwrap();
 
         Ok(Expr::Literal {
-            value: crate::Value::new(value),
+            value: crate::Value::direct(value),
         })
     }
 
