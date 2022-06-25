@@ -172,8 +172,13 @@ impl<'a> Parser<'a> {
     }
 
     fn expected_error(&self, expected: TokenType, found: TokenType) -> ParserError {
+        let src = if self.lexer.source().is_empty() {
+            String::from("\n")
+        } else {
+            self.lexer.source().to_string()
+        };
         ParserError {
-            src: self.lexer.source().to_string(),
+            src,
             message: format!("Expected `{expected}`, found `{found}`"),
             label: format!("Expected `{expected}`"),
             span: self.previous.span.clone().into(),
