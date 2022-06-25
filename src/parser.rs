@@ -122,11 +122,17 @@ impl<'a> Parser<'a> {
     }
 
     fn value(&mut self) -> Result<Expr<'a>> {
-        let value = self.previous.lexeme().parse().unwrap();
-
-        Ok(Expr::Literal {
-            value: crate::Value::direct(value),
-        })
+        match self.previous.lexeme().parse() {
+            Ok(value) => Ok(Expr::Literal {
+                value: crate::Value::direct(value),
+            }),
+            Err(e) => Err(ParserError {
+                src: self.lexer.source().to_string(),
+                message: format!("Could not parse number: {}", e),
+                label: format!("{}", e),
+                span: self.previous.span.clone().into(),
+            }),
+        }
     }
 
     fn advance(&mut self) -> Result<&Token<'a>> {
@@ -169,7 +175,7 @@ impl<'a> Parser<'a> {
         ParserError {
             src: self.lexer.source().to_string(),
             message: format!("Expected `{expected}`, found `{found}`"),
-            label: format!("Expected a `{expected}`"),
+            label: format!("Expected `{expected}`"),
             span: self.previous.span.clone().into(),
         }
     }
