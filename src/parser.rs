@@ -35,6 +35,7 @@ impl<'a> Parser<'a> {
                     "Unexpected characters `{:.10}` at the end of file.",
                     self.current.lexeme().to_string() + self.lexer.remainder(),
                 ),
+                label: format!("Here"),
                 span: self.current.span.into(),
             })
         }
@@ -111,16 +112,12 @@ impl<'a> Parser<'a> {
             TokenType::Number => self.value(),
             TokenType::LeftParen => {
                 let expr = self.expression()?;
-                self.consume(&TokenType::RightParen, ")")?;
+                self.consume(TokenType::RightParen)?;
                 Ok(Expr::Grouping {
                     expression: Box::new(expr),
                 })
             }
-            ty => Err(ParserError {
-                src: self.lexer.source().to_string(),
-                message: format!("Expecting a number or a parenthesis but instead got {ty:?}",),
-                span: self.previous.span.clone().into(),
-            }),
+            ty => Err(self.expected_error(TokenType::Number, ty)),
         }
     }
 
@@ -146,13 +143,13 @@ impl<'a> Parser<'a> {
         self.current.ty == TokenType::EoF
     }
 
-    fn check(&mut self, ty: &TokenType) -> bool {
-        &self.current.ty == ty
+    fn check(&mut self, ty: TokenType) -> bool {
+        self.current.ty == ty
     }
 
     fn is_followed_by(&mut self, types: impl IntoIterator<Item = TokenType>) -> Result<bool> {
         for ty in types {
-            if self.check(&ty) {
+            if self.check(ty) {
                 self.advance()?;
                 return Ok(true);
             }
@@ -160,15 +157,20 @@ impl<'a> Parser<'a> {
         Ok(false)
     }
 
-    fn consume(&mut self, ty: &TokenType, expecting: impl AsRef<str>) -> Result<&Token<'a>> {
-        if self.check(ty) {
+    fn consume(&mut self, expecting: TokenType) -> Result<&Token<'a>> {
+        if self.check(expecting) {
             self.advance()
         } else {
-            Err(ParserError {
-                src: self.lexer.source().to_string(),
-                message: format!("Expecting `{}` but instead got {ty:?}", expecting.as_ref()),
-                span: self.current.span.clone().into(),
-            })
+            Err(self.expected_error(expecting, self.previous.ty))
+        }
+    }
+
+    fn expected_error(&self, expected: TokenType, found: TokenType) -> ParserError {
+        ParserError {
+            src: self.lexer.source().to_string(),
+            message: format!("Expected `{expected}`, found `{found}`"),
+            label: format!("Expected a `{expected}`"),
+            span: self.previous.span.clone().into(),
         }
     }
 }

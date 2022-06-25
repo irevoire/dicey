@@ -1,4 +1,6 @@
 //! This module is dedicated to the definition and parsing of the [`Token`]s
+use std::fmt::Display;
+
 use logos::{Lexer, Logos};
 
 #[derive(Debug, Clone, PartialEq)]
@@ -59,4 +61,22 @@ pub enum TokenType {
     Error,
 
     EoF,
+}
+
+impl Display for TokenType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TokenType::LeftParen => write!(f, "("),
+            TokenType::RightParen => write!(f, ")"),
+            TokenType::Minus => write!(f, "-"),
+            TokenType::Plus => write!(f, "+"),
+            TokenType::Slash => write!(f, "/"),
+            TokenType::Star => write!(f, "*"),
+            TokenType::Number => write!(f, "number"),
+            TokenType::Float => write!(f, "float"),
+            TokenType::Dice => write!(f, "dice"),
+            TokenType::Error => write!(f, "error"),
+            TokenType::EoF => write!(f, "EoF"),
+        }
+    }
 }

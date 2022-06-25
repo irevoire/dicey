@@ -25,14 +25,14 @@ pub enum SetupError {
 }
 
 #[derive(Diagnostic, Error, Debug)]
-#[error("{message}")]
-#[diagnostic(help("good luck"))]
+#[error("Error: {message}")]
 pub struct ParserError {
     #[source_code]
     pub src: String,
-    #[label("here")]
+    #[label("{label}")]
     pub span: SourceSpan,
     pub message: String,
+    pub label: String,
 }
 
 #[derive(Error, Debug)]
