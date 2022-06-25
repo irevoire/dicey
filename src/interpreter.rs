@@ -3,21 +3,28 @@ use rand::{rngs::ThreadRng, Rng};
 
 type Result<T> = std::result::Result<T, InterpreterError>;
 
-pub struct Interpreter {
-    rng: ThreadRng,
+pub struct Interpreter<Rng> {
+    rng: Rng,
 }
 
-impl Interpreter {
-    pub fn new() -> Self {
-        Self {
-            rng: rand::thread_rng(),
-        }
-    }
-
+impl Interpreter<ThreadRng> {
     pub fn run(source: &str) -> crate::error::Result<Value> {
         let parser = crate::parser::Parser::new(source);
         let expr = parser.parse()?;
-        let mut interpreter = Self::new();
+        let mut interpreter = Interpreter::<ThreadRng>::default();
+        Ok(interpreter.interpret(&expr)?)
+    }
+}
+
+impl<R: Rng> Interpreter<R> {
+    pub fn new(rng: R) -> Self {
+        Self { rng }
+    }
+
+    pub fn run_with_rng(source: &str, rng: R) -> crate::error::Result<Value> {
+        let parser = crate::parser::Parser::new(source);
+        let expr = parser.parse()?;
+        let mut interpreter = Self::new(rng);
         Ok(interpreter.interpret(&expr)?)
     }
 
@@ -26,8 +33,16 @@ impl Interpreter {
     }
 }
 
+impl Default for Interpreter<ThreadRng> {
+    fn default() -> Self {
+        Self {
+            rng: rand::thread_rng(),
+        }
+    }
+}
+
 impl Expr<'_> {
-    fn interpret(&self, interpreter: &mut Interpreter) -> Result<Value> {
+    fn interpret<R: Rng>(&self, interpreter: &mut Interpreter<R>) -> Result<Value> {
         match self {
             Expr::Unary { operator, right } => {
                 let right = right.interpret(interpreter)?;
