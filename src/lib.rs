@@ -1,3 +1,5 @@
+#![feature(iter_intersperse)]
+
 mod error;
 pub use error::*;
 

@@ -1,12 +1,13 @@
 use std::{
     fmt::Display,
+    iter::once,
     ops::{Add, Deref, Div, Mul, Neg, Sub},
 };
 
 #[derive(Debug, Clone)]
 pub struct Value {
-    current: isize,
-    all: Vec<Kind>,
+    pub current: isize,
+    pub all: Vec<Kind>,
 }
 
 impl PartialEq for Value {
@@ -18,7 +19,8 @@ impl PartialEq for Value {
 #[derive(Debug, Clone)]
 pub enum Kind {
     Direct(isize),
-    Roll(Vec<isize>),
+    Roll(Vec<Kind>),
+    Token(String),
 }
 
 impl Value {
@@ -40,7 +42,25 @@ impl Value {
 
 impl Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} ({:?})", self.current, self.all)
+        write!(f, "{} <= (", self.current)?;
+        self.all
+            .iter()
+            .intersperse(&Kind::Token(" ".to_string()))
+            .chain(once(&Kind::Token(")".to_string())))
+            .try_for_each(|kind| write!(f, "{kind}"))
+    }
+}
+
+impl Display for Kind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Kind::Direct(i) => write!(f, "{i}"),
+            Kind::Roll(roll) => once(&Kind::Token("(".to_string()))
+                .chain(roll.into_iter().intersperse(&Kind::Token(" ".to_string())))
+                .chain(once(&Kind::Token(")".to_string())))
+                .try_for_each(|kind| write!(f, "{kind}")),
+            Kind::Token(s) => write!(f, "{s}"),
+        }
     }
 }
 
@@ -64,7 +84,11 @@ impl Add for Value {
     fn add(self, rhs: Self) -> Self::Output {
         Self::new(
             self.current + rhs.current,
-            self.all.into_iter().chain(rhs.all).collect(),
+            self.all
+                .into_iter()
+                .chain(once(Kind::Token("+".to_string())))
+                .chain(rhs.all)
+                .collect(),
         )
     }
 }
@@ -75,7 +99,11 @@ impl Sub for Value {
     fn sub(self, rhs: Self) -> Self::Output {
         Self::new(
             self.current - rhs.current,
-            self.all.into_iter().chain(rhs.all).collect(),
+            self.all
+                .into_iter()
+                .chain(once(Kind::Token("-".to_string())))
+                .chain(rhs.all)
+                .collect(),
         )
     }
 }
@@ -85,7 +113,11 @@ impl Mul for Value {
     fn mul(self, rhs: Self) -> Self::Output {
         Self::new(
             self.current * rhs.current,
-            self.all.into_iter().chain(rhs.all).collect(),
+            self.all
+                .into_iter()
+                .chain(once(Kind::Token("x".to_string())))
+                .chain(rhs.all)
+                .collect(),
         )
     }
 }
@@ -96,7 +128,11 @@ impl Div for Value {
     fn div(self, rhs: Self) -> Self::Output {
         Self::new(
             self.current / rhs.current,
-            self.all.into_iter().chain(rhs.all).collect(),
+            self.all
+                .into_iter()
+                .chain(once(Kind::Token("÷".to_string())))
+                .chain(rhs.all)
+                .collect(),
         )
     }
 }

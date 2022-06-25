@@ -58,12 +58,21 @@ impl Expr<'_> {
                 faces,
             } => {
                 let quantity = quantity.interpret(interpreter)?;
-                let faces = *faces.interpret(interpreter)?;
+                let faces = faces.interpret(interpreter)?;
 
                 let results: Vec<isize> = (0..*quantity)
-                    .map(|_| interpreter.rng.gen_range(0..faces))
+                    .map(|_| interpreter.rng.gen_range(1..=*faces))
                     .collect();
-                Ok(Value::kind(results.iter().sum(), Kind::Roll(results)))
+                let value = results.iter().sum();
+
+                let all = Kind::Roll(
+                    results
+                        .into_iter()
+                        .map(|i| Kind::Direct(i))
+                        .intersperse(Kind::Token("+".to_string()))
+                        .collect(),
+                );
+                Ok(Value::new(value, vec![Kind::Direct(value), all]))
             }
         }
     }
