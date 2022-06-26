@@ -35,5 +35,11 @@ pub struct ParserError {
     pub label: String,
 }
 
+impl ParserError {
+    pub fn to_report(self) -> String {
+        format!("{}", miette::Report::from(self))
+    }
+}
+
 #[derive(Error, Debug)]
 pub enum InterpreterError {}
