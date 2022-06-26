@@ -38,7 +38,7 @@ fn run_prompt() -> Result<()> {
         let line = line.map_err(SetupError::from)?;
         match run(&line) {
             Ok(_) => (),
-            Err(Error::Parser(error)) => println!("{:?}", miette::Report::from(error)),
+            Err(Error::Parser(error)) => println!("{}", error.to_report()),
             Err(error) => println!("{:?}", error),
         }
         print!("> ");

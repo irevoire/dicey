@@ -37,7 +37,7 @@ pub struct ParserError {
 
 impl ParserError {
     pub fn to_report(self) -> String {
-        format!("{}", miette::Report::from(self))
+        format!("{:?}", miette::Report::from(self))
     }
 }
 
