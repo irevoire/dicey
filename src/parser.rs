@@ -48,6 +48,7 @@ impl<'a> Parser<'a> {
     fn term(&mut self) -> Result<Expr<'a>> {
         let mut expr = self.factor()?;
 
+        println!("looking for minus, but next token is {:?}", self.current.ty);
         while self.is_followed_by([TokenType::Minus, TokenType::Plus])? {
             let operator = self.previous.clone();
             let right = Box::new(self.factor()?);
@@ -64,7 +65,12 @@ impl<'a> Parser<'a> {
     fn factor(&mut self) -> Result<Expr<'a>> {
         let mut expr = self.roll()?;
 
-        while self.is_followed_by([TokenType::Star, TokenType::Slash])? {
+        while self.is_followed_by([
+            TokenType::Star,
+            TokenType::Multiplication,
+            TokenType::Slash,
+            TokenType::Division,
+        ])? {
             let operator = self.previous.clone();
             let right = Box::new(self.roll()?);
 
@@ -83,7 +89,7 @@ impl<'a> Parser<'a> {
 
         while self.is_followed_by([TokenType::Dice])? {
             let dice = self.previous.clone();
-            let faces = Box::new(self.primary()?);
+            let faces = Box::new(self.unary()?);
 
             expr = Expr::Roll {
                 quantity: Box::new(expr),
@@ -134,6 +140,8 @@ impl<'a> Parser<'a> {
             }),
         }
     }
+
+    // ------------- After this line are the tools to help build the parser
 
     fn advance(&mut self) -> Result<&Token<'a>> {
         if self.is_at_end() {

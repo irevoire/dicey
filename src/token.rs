@@ -39,14 +39,18 @@ pub enum TokenType {
     LeftParen,
     #[token(")")]
     RightParen,
-    #[token("-")]
+    #[regex(r"[\-−]")]
     Minus,
     #[token("+")]
     Plus,
     #[token("/")]
     Slash,
+    #[token("÷")]
+    Division,
     #[token("*")]
     Star,
+    #[regex("[xX×]")]
+    Multiplication,
 
     // Literals
     #[regex(r#"[0-9]+"#)]
@@ -56,7 +60,7 @@ pub enum TokenType {
     #[regex("[dD]")]
     Dice,
 
-    #[regex(r"[ \r\t\n]+", logos::skip)]
+    #[regex(r"[  \r\t\n]+", logos::skip)]
     #[error]
     Error,
 
@@ -68,10 +72,12 @@ impl Display for TokenType {
         match self {
             TokenType::LeftParen => write!(f, "("),
             TokenType::RightParen => write!(f, ")"),
-            TokenType::Minus => write!(f, "-"),
+            TokenType::Minus => write!(f, "−"),
             TokenType::Plus => write!(f, "+"),
             TokenType::Slash => write!(f, "/"),
+            TokenType::Division => write!(f, "÷"),
             TokenType::Star => write!(f, "*"),
+            TokenType::Multiplication => write!(f, "×"),
             TokenType::Number => write!(f, "number"),
             TokenType::Float => write!(f, "float"),
             TokenType::Dice => write!(f, "dice"),

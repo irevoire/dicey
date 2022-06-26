@@ -1,4 +1,4 @@
-use crate::{Expr, InterpreterError, Kind, Value};
+use crate::{Expr, InterpreterError, Kind, TokenType, Value};
 use rand::{rngs::ThreadRng, Rng};
 
 type Result<T> = std::result::Result<T, InterpreterError>;
@@ -57,11 +57,11 @@ impl Expr<'_> {
                 right,
             } => {
                 let (left, right) = (left.interpret(interpreter)?, right.interpret(interpreter)?);
-                match operator.lexeme() {
-                    "+" => Ok(left + right),
-                    "-" => Ok(left - right),
-                    "*" | "(" => Ok(left * right),
-                    "/" => Ok(left / right),
+                match operator.ty {
+                    TokenType::Plus => Ok(left + right),
+                    TokenType::Minus => Ok(left - right),
+                    TokenType::Star | TokenType::Multiplication => Ok(left * right),
+                    TokenType::Slash | TokenType::Division => Ok(left / right),
                     _ => unreachable!(),
                 }
             }
@@ -119,7 +119,9 @@ mod tests {
             ("1 + 1", 2),
             ("5 - 1", 4),
             ("2 * 3", 6),
+            ("2 * 2 x 2 X 2 × 2", 2 * 2 * 2 * 2 * 2),
             ("6 / 3", 2),
+            ("100 / 2 ÷ 2", 25),
             ("1 / 2", 0),
             ("2 + 3 * 2", 8),
             ("2 + (3 * 2)", 8),
